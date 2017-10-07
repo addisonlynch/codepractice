@@ -28,29 +28,30 @@ class bond(object):
         self.n = intervals
         self.d = discr
         self.fx = func
-        self.h=self.j/self.n
+        self.h=float(duration)/intervals
         self.interval_list = calculateIntervals(self.j, self.n)
 
-    #function,face_value coupon, duration, intervals, discreet
+        print( self.__dict__)
+    
+    def discount_factor(self,start,end):
+        if self.d:
+            ans = self.fx[str(end)]
+        else:
+            ans = quad(self.fx,start,end)[0]        
+        retval=math.exp((-1)*ans*(end))
+        print("Discount factor for " + str(start)+ " to " + str(end)+ ": " + str(retval))
+        return(retval)
+      
     def bond_price_instant(self):
-
-        
-        #print(calculateIntervals(2,4)[0][0])
-        def discount_factor(start,end):
-            if self.discr:
-                return self.fx(str(end))
-            else:
-                return math.exp((-1)*quad(self.fx,start,end)[0]*(end))        
-     #       retval= ans
-    #        print("Discount factor for " + str(start)+ " to " + str(end)+ ": " + str(retval))
         price = float(0)
         for inter in self.interval_list:
             if inter[1] == self.j:
-                price += (f+(c/2)*f)*discount_factor(inter[0], inter[1])
+                price += (self.f+(self.c/2)*self.f)*self.discount_factor(inter[0], inter[1])
                 break
-            discount =discount_factor(inter[0],inter[1])
-            price += (c/2)*f*discount
+            discount =self.discount_factor(inter[0],inter[1])
+            price += (self.c/2)*self.f*discount
         self.price = price
+        print(price)
         print("Price set.")
         return
 
@@ -65,7 +66,8 @@ def main():
         '2.0':0.055
     }
     b = bond(100, 0.05, 2, 4, True, fx)
-    
+    b.bond_price_instant()
+    print(b.price)
 
 
 
