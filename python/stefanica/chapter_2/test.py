@@ -10,7 +10,7 @@ f  = lambda x : 0.045 + (0.005*(1+x)*math.log(1+x))/x
 #auxillary zero rate curve function
 
 
-class pmt(Enum):
+class pmts(Enum):
     ANNUAL = 1
     SEMI_ANNUAL = 2
     QUARTERLY = 3
@@ -44,23 +44,52 @@ class bond(object):
         self.interval_list = calculateIntervals(self.j, self.n)
         self.t_cash_flow = [interval[1] for interval in self.interval_list]
         self.v_cash_flow = []
-        self.price=-1
+        self.calculate_v_cash_flows()
+        self.price = float(105)
+
+    def set_price(self, price, auto=False):
+        if auto:
+            self.price = bond_price_stefanica(self)
+        else:
+            self.price = price
 
 
-        print( self.__dict__)
+
+#        print( self.__dict__)
+
     def calculate_v_cash_flows(self):
-        for i in range(0,(j-h))
+        i = self.h
+        while i <= (self.j-self.h):
             self.v_cash_flow.append((self.c/self.p)*self.f)
+            i = i + self.h
         self.v_cash_flow.append(self.f+(self.c/2*self.f))
-        print self.v_cash_flow
+        print ([flow for flow in self.v_cash_flow])
         return
 
+    def interest_rate(self,time):
+        if self.d:
+            return(self.fx[str(time)])
+        else:
+            return(quad(self.fx,0,time)[0])
+
     
- 
+def bond_price_stefanica(bond):
+    B = 0
+    disc={}
+    for i in range(0,bond.n):
+        disc[i] = math.exp((-1)*bond.t_cash_flow[i]*bond.interest_rate(bond.t_cash_flow[i]))
+        print("time " + str(bond.t_cash_flow[i]) + ": discount: " + str(disc[i]) + " | cf: " + str(bond.v_cash_flow[i]))
+
+        B = B + bond.v_cash_flow[i] * disc[i]
+    print(B)
+    return
 
 
-def bond_yield(bond):
-    if bond.price=-1:
+
+
+#From table 8.6
+def bond_yield_stefanica(bond):
+    if bond.price== (-1):
         return 
     x_0 = 0.1 #initial guess 10%
     x_new = x_0
@@ -68,9 +97,18 @@ def bond_yield(bond):
     tol = float(10**(-6))
 
     while(math.fabs(x_new - x_old) > tol):
+        print("x_new: " + str(x_new))
         x_old = x_new
+        numerator =0 
+        denominator = 0
+        for i in range(0,bond.n):
+            numerator += (bond.v_cash_flow[i]*math.exp(((-1)*x_old)*bond.t_cash_flow[i]))
+        for j in range(0,bond.n):
+            denominator += (bond.t_cash_flow[j]*bond.v_cash_flow[j]*math.exp(((-1)*x_old)*bond.t_cash_flow[j]))
+        x_new = x_old + (float((numerator-bond.price))/denominator)
+    return x_new
 
-        numerator =
+        
 def discount_factor(bond,start,end):
         if bond.d:
             ans = bond.fx[str(end)]
@@ -84,9 +122,9 @@ def bond_price_instant(bond):
     price = float(0)
     for inter in bond.interval_list:
         if inter[1] == bond.j:
-            price += (bond.f+(bond.c/2)*bond.f)*bond.discount_factor(inter[0], inter[1])
+            price += (bond.f+(bond.c/2)*bond.f)*discount_factor(bond, inter[0], inter[1])
             break
-        discount =bond.discount_factor(inter[0],inter[1])
+        discount =discount_factor(bond,inter[0],inter[1])
         price += (bond.c/2)*bond.f*discount
     bond.price = price
     print(price)
@@ -100,10 +138,9 @@ def main():
         '1.5':0.0535,
         '2.0':0.055
     }
-    b = bond(100, 0.05, 2, 4, True, fx, pmts.SEMI_ANNUAL)
-    b.bond_price_instant()
-    print(b.price)
+    b = bond(100, 0.08, 2, 6, True, fx, 2)
 
+    print(bond_yield_stefanica(b))
 
 
 
