@@ -6,9 +6,7 @@ from scipy.integrate import quad
 
 
 f  = lambda x : 0.045 + (0.005*(1+x)*math.log(1+x))/x
-
 #auxillary zero rate curve function
-
 
 class pmts(Enum):
     ANNUAL = 1
@@ -17,9 +15,6 @@ class pmts(Enum):
     MONTHLY = 12
     WEEKLY = 52
     DAILY = 365
-
-
-
 
 def calculateIntervals(length,n_intervals):
     intervals=[]
@@ -45,7 +40,7 @@ class bond(object):
         self.t_cash_flow = [interval[1] for interval in self.interval_list]
         self.v_cash_flow = []
         self.calculate_v_cash_flows()
-        self.price = float(105)
+        self.price = float(100+(1/32))
 
     def set_price(self, price, auto=False):
         if auto:
@@ -72,7 +67,7 @@ class bond(object):
         else:
             return(quad(self.fx,0,time)[0])
 
-    
+    #requires: number of intervals(n), time of cash flows, value of cash flows
 def bond_price_stefanica(bond):
     B = 0
     disc={}
@@ -83,9 +78,6 @@ def bond_price_stefanica(bond):
         B = B + bond.v_cash_flow[i] * disc[i]
     print(B)
     return
-
-
-
 
 #From table 8.6
 def bond_yield_stefanica(bond):
@@ -138,12 +130,12 @@ def main():
         '1.5':0.0535,
         '2.0':0.055
     }
-    b = bond(100, 0.08, 2, 6, True, fx, 2)
-
-    print(bond_yield_stefanica(b))
+    b = bond(100, 0.03375, 2, 4, True, fx, 2)
 
 
 
+    c = bond(100, 0.08, 2, 6, True, fx, 2)
+    print(bond_yield_stefanica(c))
 
 
 '''
