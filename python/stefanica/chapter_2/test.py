@@ -100,6 +100,22 @@ def bond_yield_stefanica(bond):
         x_new = x_old + (float((numerator-bond.price))/denominator)
     return x_new
 
+def bond_duration_stefanica(bond,m_yield):
+	B = 0
+	D = 0
+	C = 0
+	disc = {}
+	for i in range(0,n):
+		disc[i] = exp((-1)*(bond.t_cash_flow[i])*m_yield)
+		B = B + bond.v_cash_flow[i] * disc[i]
+		D = D + (bond.t_cash_flow[i]**2) * bond.v_cash_flow[i] * disc[i]
+		C = C + (bond.t_cash_flow[i]**2)* bond.v_cash_flow*disc[i]
+	D = D/B
+	C = C/B
+	return({{"price":B}, {"duration":D}, {"convexity":C}})
+
+
+
         
 def discount_factor(bond,start,end):
         if bond.d:
